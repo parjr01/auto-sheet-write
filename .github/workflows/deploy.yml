@@ -26,12 +26,12 @@ jobs:
         run: bun install
 
       - name: Build project
-        run: NITRO_PRESET=github-pages bun run build
+        run: bun run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .output/public
+          path: ./dist # Tells GitHub to upload the standard Vite build output folder
 
       - name: Deploy to GitHub Pages
         id: deployment
