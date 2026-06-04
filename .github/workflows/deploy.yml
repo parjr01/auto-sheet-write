@@ -28,10 +28,20 @@ jobs:
       - name: Build project
         run: bun run build
 
+      - name: Handle build output paths
+        run: |
+          if [ -d ".output/public" ]; then
+            cp -r .output/public ./dist_final
+          elif [ -d "dist" ]; then
+            cp -r dist ./dist_final
+          else
+            mkdir ./dist_final && cp index.html ./dist_final/ || true
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist # Tells GitHub to upload the standard Vite build output folder
+          path: ./dist_final
 
       - name: Deploy to GitHub Pages
         id: deployment
