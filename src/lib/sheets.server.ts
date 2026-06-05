@@ -110,3 +110,19 @@ export async function deleteRow(rowNumber: number) {
     }),
   });
 }
+
+export async function replaceAllRows(rows: Record<string, string>[]) {
+  const sheet = await firstSheet();
+  await ensureHeaders(sheet.title);
+  // Clear existing data rows
+  await gw(`/spreadsheets/${SPREADSHEET_ID}/values/${sheet.title}!A2:H100000:clear`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  if (!rows.length) return;
+  const values = rows.map((r) => HEADERS.map((h) => r[h] ?? ""));
+  await gw(
+    `/spreadsheets/${SPREADSHEET_ID}/values/${sheet.title}!A2?valueInputOption=USER_ENTERED`,
+    { method: "PUT", body: JSON.stringify({ values }) },
+  );
+}

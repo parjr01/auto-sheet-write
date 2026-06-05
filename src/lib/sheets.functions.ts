@@ -6,8 +6,8 @@ const RowSchema = z.object({
   meetingDate: z.string().max(40).default(""),
   title: z.string().min(1).max(300),
   owner: z.string().max(120).default(""),
-  priority: z.enum(["Low", "Medium", "High", "Critical", ""]).default(""),
-  status: z.enum(["Not Started", "In Progress", "Blocked", "Completed", ""]).default(""),
+  priority: z.string().max(20).default(""),
+  status: z.string().max(20).default(""),
   dueDate: z.string().max(40).default(""),
   progress: z.string().max(10).default(""),
   notes: z.string().max(2000).default(""),
@@ -46,5 +46,14 @@ export const deleteSheetRow = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { deleteRow } = await import("./sheets.server");
     await deleteRow(data.rowNumber);
+    return { ok: true };
+  });
+
+export const replaceAllSheetRows = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ rows: z.array(RowSchema).max(10000) }).parse(d))
+  .handler(async ({ data }) => {
+    const { replaceAllRows } = await import("./sheets.server");
+    await replaceAllRows(data.rows);
     return { ok: true };
   });
